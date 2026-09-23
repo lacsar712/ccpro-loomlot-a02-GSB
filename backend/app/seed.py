@@ -2,11 +2,17 @@ from datetime import datetime, timedelta, timezone
 
 from app.auth import hash_password
 from app.database import SessionLocal
+from app.models.chemical_dose import ChemicalDose
 from app.models.dye_house import DyeHouse
 from app.models.dye_lot import DyeLot
 from app.models.fastness_check import FastnessCheck
 from app.models.user import User
 from app.models.vat import Vat
+
+
+def _week_start(now: datetime) -> datetime:
+    monday = now - timedelta(days=now.weekday())
+    return monday.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
 def seed() -> None:
@@ -117,6 +123,33 @@ def seed() -> None:
                     ),
                 ]
             )
+
+            # 助剂加注演示数据：
+            # V-01 缸容 800L，未排液累计上限 240L（30%）；最新染程布重 42.5kg，
+            # 按 1kg 折 1 升、单笔不超过一半，单次上限 21.25L。
+            # 预置 11 笔 × 21L = 231L（均 ≤21.25L 且累计 ≤240L），
+            # 此时再向 V-01 加注 10L 将达 241L，触发缸容超限 409（回显已累计 231L）。
+            week_start = _week_start(now)
+            safe_past = now - timedelta(minutes=1)
+            v01_doses = [
+                ChemicalDose(
+                    vat_id=v1.id,
+                    chemical_name="纯碱缓冲剂",
+                    dose_l=21.0,
+                    dosed_at=min(week_start + timedelta(hours=i + 1), safe_past),
+                    operator_name="染程操作员",
+                )
+                for i in range(11)
+            ]
+            # V-02 就绪缸一笔小额加注（就绪态无布重联锁；累计上限 600L×30%=180L）。
+            v02_dose = ChemicalDose(
+                vat_id=v2.id,
+                chemical_name="渗透匀染剂",
+                dose_l=30.0,
+                dosed_at=min(week_start + timedelta(hours=12), safe_past),
+                operator_name="染程操作员",
+            )
+            db.add_all([*v01_doses, v02_dose])
             db.commit()
             print("Seed data inserted.")
         else:

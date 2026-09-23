@@ -1,6 +1,7 @@
-from typing import List, TYPE_CHECKING
+from datetime import datetime
+from typing import List, Optional, TYPE_CHECKING
 
-from sqlalchemy import String, Integer, Float, ForeignKey, UniqueConstraint
+from sqlalchemy import String, Integer, Float, ForeignKey, UniqueConstraint, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -8,6 +9,7 @@ from app.database import Base
 if TYPE_CHECKING:
     from app.models.dye_house import DyeHouse
     from app.models.dye_lot import DyeLot
+    from app.models.chemical_dose import ChemicalDose
 
 
 class Vat(Base):
@@ -20,8 +22,12 @@ class Vat(Base):
     fiber_type: Mapped[str] = mapped_column(String(64), nullable=False)
     capacity_l: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="ready")
+    last_drained_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     dye_house: Mapped["DyeHouse"] = relationship("DyeHouse", back_populates="vats")
     dye_lots: Mapped[List["DyeLot"]] = relationship(
         "DyeLot", back_populates="vat", cascade="all, delete-orphan"
+    )
+    chemical_doses: Mapped[List["ChemicalDose"]] = relationship(
+        "ChemicalDose", back_populates="vat", cascade="all, delete-orphan"
     )

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -9,3 +11,5 @@ class DashboardStats(BaseModel):
     vat_dyeing_count: int = Field(serialization_alias="vatDyeingCount")
     lots_last_7d: int = Field(serialization_alias="lotsLast7d")
     checks_last_24h: int = Field(serialization_alias="checksLast24h")
+    doses_l_this_week: float = Field(serialization_alias="dosesLThisWeek")
+    week_start: datetime = Field(serialization_alias="weekStart")
