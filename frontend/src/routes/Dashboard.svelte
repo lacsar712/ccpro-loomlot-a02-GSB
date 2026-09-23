@@ -44,6 +44,10 @@
       <div class="n">{stats.checksLast24h}</div>
       <div class="l">近 24 时抽检</div>
     </div>
+    <div class="stat">
+      <div class="n">{stats.auxDoseLitersThisWeek ?? 0}</div>
+      <div class="l">本周加注 L</div>
+    </div>
   </div>
 {/if}
 
@@ -55,6 +59,7 @@
     <a class="btn" href="/houses" use:link>进入染坊</a>
     <a class="btn ghost" href="/vats" use:link>管理染缸</a>
     <a class="btn ghost" href="/lots" use:link>登记染程</a>
+    <a class="btn ghost" href="/doses" use:link>助剂加注</a>
     <a class="btn ghost" href="/checks" use:link>色牢度抽检</a>
   </div>
 </div>

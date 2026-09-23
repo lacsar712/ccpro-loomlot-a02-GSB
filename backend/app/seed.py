@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.auth import hash_password
 from app.database import SessionLocal
+from app.models.aux_dose import AuxDose
 from app.models.dye_house import DyeHouse
 from app.models.dye_lot import DyeLot
 from app.models.fastness_check import FastnessCheck
@@ -114,6 +115,36 @@ def seed() -> None:
                         rub_fastness=4.0,
                         temp_c=37.0,
                         notes=None,
+                    ),
+                ]
+            )
+
+            # 助剂加注演示数据：
+            # v2（V-02，就绪，缸容 600L，30% 上限 180L）未排液期间已累计 170L，
+            # 在该缸再提交超过 10L 的加注单即触发 409 缸容超限，方便演示失败回显。
+            # v1（V-01，染色中，最新染程布重 42.5kg → 单次上限 42.5/2=21.25L）为正常加注。
+            db.add_all(
+                [
+                    AuxDose(
+                        vat_id=v2.id,
+                        aux_name="渗透剂 JFC",
+                        liters=120.0,
+                        dosed_at=now - timedelta(hours=3),
+                        operator_name="染程操作员",
+                    ),
+                    AuxDose(
+                        vat_id=v2.id,
+                        aux_name="匀染剂",
+                        liters=50.0,
+                        dosed_at=now - timedelta(hours=1),
+                        operator_name="染程操作员",
+                    ),
+                    AuxDose(
+                        vat_id=v1.id,
+                        aux_name="冰醋酸",
+                        liters=15.0,
+                        dosed_at=now - timedelta(hours=2),
+                        operator_name="染程操作员",
                     ),
                 ]
             )

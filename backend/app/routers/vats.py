@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.exc import IntegrityError
@@ -103,6 +104,7 @@ def drain_vat(
     if item.status == "drain":
         raise HTTPException(status_code=400, detail="染缸已在排液状态")
     item.status = "drain"
+    item.drained_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(item)
     return item

@@ -10,6 +10,7 @@
   import Vats from './routes/Vats.svelte';
   import DyeLots from './routes/DyeLots.svelte';
   import FastnessChecks from './routes/FastnessChecks.svelte';
+  import AuxDoses from './routes/AuxDoses.svelte';
 
   const requireAuth = () => !!get(token);
 
@@ -19,6 +20,7 @@
     '/houses': wrap({ component: DyeHouses, conditions: [requireAuth] }),
     '/vats': wrap({ component: Vats, conditions: [requireAuth] }),
     '/lots': wrap({ component: DyeLots, conditions: [requireAuth] }),
+    '/doses': wrap({ component: AuxDoses, conditions: [requireAuth] }),
     '/checks': wrap({ component: FastnessChecks, conditions: [requireAuth] }),
   };
 
